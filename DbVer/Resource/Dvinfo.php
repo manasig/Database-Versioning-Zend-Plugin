@@ -1,17 +1,19 @@
 <?php
 class DbVer_Resource_Dvinfo extends Zend_Application_Resource_ResourceAbstract
 {
-
+    /** Default regiester key */	
     const DEFAULT_REGISTRY_KEY = 'DvInfo';
 
     protected $_dvInfo;
 
+    /** Initial function */	
     public function init() {
-        return $this->getDvInfo();
+        return $this->startDatabaseVersion();
 
     }
 
-    public function setDatabaseProperties() {
+    /** to Set data */	
+    public function setDataProperties() {
 
         $options = $this->getOptions();
 
@@ -25,22 +27,17 @@ class DbVer_Resource_Dvinfo extends Zend_Application_Resource_ResourceAbstract
         $db['defaultBuild'] = isset($options['defaultBuild']) ? $options['defaultBuild'] : '';
         $db['buildPath'] = isset($options['buildPath']) ? $options['buildPath'] : '';
         $db['appPath'] = isset($options['appPath']) ? $options['appPath'] : '';
-
-
-        $db['key'] = (isset($options['registry_key']) && !is_numeric($options['registry_key']))
-
-                 ? $options['registry_key']
-
-                 : self::DEFAULT_REGISTRY_KEY;
+        $db['key'] = (isset($options['registry_key']) && !is_numeric($options['registry_key'])) ? $options['registry_key'] : self::DEFAULT_REGISTRY_KEY;
         return $db;
     }
 
-    public function getDvInfo()
+    /** to start Database version */	
+    public function startDatabaseVersion()
     {
 
         if (null === $this->_dvInfo) {
 
-            $db = $this->setDatabaseProperties();
+            $db = $this->setDataProperties();
             $this->_dvInfo = new DbVer_DvInfo($db);
 
             Zend_Registry::set($db['key'], $this->_dvInfo);

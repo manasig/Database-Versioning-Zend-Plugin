@@ -4,26 +4,38 @@
 */
 class DbVer_DvInfo {
 
+    /** database properties */		
     protected $_db;
 
-    protected $_database;
+    /** other data info */
+    protected $_datainfo;
 
-    protected $_name = 'schema_build_log';
-
+    /** table name for schema if not defined */
+    protected $_tablename = 'schema_build_log';
+    
+    /** build id defined */
     protected $build_id;
 
+    /** build list */	
     protected $build_list = array();
 
+    /** default build id */
     protected $_defaultbuild = 1;
 
-    public function __construct($database)
+    /** if schema table present set to 0 */
+    protected $_newschematable = 0;
+
+    public function __construct($data)
     {
-        $this->_database = $database;
-        $this->setDatabase($database);
-        $this->setDefaultProperty($database);
+        $this->_datainfo = $data;
+        $this->setDefaultProperty($data);
 
     }
 
+    /**
+    * This is the set the migration mode to active/deactivate
+    * @param boolean $active true or false 
+    */	
     private function _enable_migration_mode($active=true)
     {
 
@@ -32,6 +44,10 @@ class DbVer_DvInfo {
             define('MIGRATION_IN_PROGRESS',true);
         }
     }
+
+    /**
+    * This is the starting point of database versioning process 
+    */	
     public function adminDbClass()
     {
 
@@ -49,7 +65,7 @@ class DbVer_DvInfo {
         {
             print("Table schema_build_log not present.Creating schema_build_log table. <br/><br/>");
             $this->startDbClass($this->_defaultbuild);
-
+	    $this->_newschematable = 1;
         }
 
         $row = $this->getLatestDbSchema();
@@ -64,11 +80,10 @@ class DbVer_DvInfo {
                 $build--;
         }
 
-
         /**
          * Build files Directory LOcation
         */
-        $builddir = $this->_database['buildPath'];
+        $builddir = $this->_datainfo['buildPath'];
         $list = scandir($builddir);
 
         foreach($list as $file)
@@ -78,46 +93,44 @@ class DbVer_DvInfo {
                 if($number >= $build) {
                     require_once($builddir.$file);
                     $classname = 'build'.$number;
-                    $class = new $classname($this->_database);
-                    $class->executeBuild();
+                    $class = new $classname($this->_datainfo);
+	            /** If the Schema table is newly created then the default build is already executed i.e. executeBuild so skip this call for default build number **/		
+		    if(!$this->_newschematable || $this->_defaultbuild != $number) {
+                    	$class->executeBuild();
+		    }
                 }
             }
         }
 
         print("All updates have ran, you are now on build ".$class->getBuildId()." <br/><br/>");
-        print('FINISHING - $this->adminDbClass() at '. date('H:i:s' , time() )." <br/><br/>");
-        //$this->controller_log('FINISHING - $this->admin_db_class() at '. date('H:i:s' , time() ) );
-        //$this->exit_flow();
-        exit;
-
+        print('FINISHING - $this->adminDbClass() at '. date('H:i:s' , time() )." <br/><br/>");        
     }
 
-    public function setDatabase($database)
-
+    /**
+    * This is to set the properties 
+    */	
+    public function setDefaultProperty($data)
     {
 
-        if (!empty($database)) {
-            $this->_db = Zend_Db::factory($database['adapter'], array(
-                'host' => $database['host'],
-                'username' => $database['username'],
-                'password' => $database['password'],
-                'dbname' => $database['dbname']
+        if (!empty($data)) {
+            $this->_db = Zend_Db::factory($data['adapter'], array(
+                'host' => $data['host'],
+                'username' => $data['username'],
+                'password' => $data['password'],
+                'dbname' => $data['dbname']
             ));
             Zend_Db_Table_Abstract::setDefaultAdapter($this->_db);
-            $this->_name = $database['tablename'];
+
+	    if ($data['tablename']) {
+            	$this->_tablename = $data['tablename'];
+	    }
+	
+	    if ($data['defaultBuild']) {
+		$this->_defaultbuild = $data['defaultBuild'];
+	    }
         }
         return $this;
     }
-
-    public function setDefaultProperty($database)
-    {
-
-        if (!empty($database)) {
-             $this->_defaultbuild = $database['defaultBuild'];
-        }
-        return $this;
-    }
-
 
     /**
     * This is the control method that will decide which db to connect
@@ -138,7 +151,7 @@ class DbVer_DvInfo {
     public function checkSchema()
     {
 
-        $qry = "CHECK TABLE $this->_name FAST QUICK";
+        $qry = "CHECK TABLE $this->_tablename FAST QUICK";
         $result = $this->_db->fetchRow($qry);
         return $result;
     }
@@ -149,7 +162,7 @@ class DbVer_DvInfo {
     */
     public function startDbClass($defaultbuild)
     {
-        $this->_db->query("CREATE TABLE $this->_name (
+        $this->_db->query("CREATE TABLE $this->_tablename (
                                 `build_id` INT(10) NOT NULL AUTO_INCREMENT,
                                 `build_function` VARCHAR(255) NOT NULL,
                                 `build_num` MEDIUMINT NOT NULL,
@@ -164,22 +177,14 @@ class DbVer_DvInfo {
         /**
          * Build files Directory LOcation
         */
-        $builddir = $this->_database['buildPath'];
+        $builddir = $this->_datainfo['buildPath'];
         // try{
         include_once($builddir.'build'.$defaultbuild.'.php');
         $buildclass = "build".$defaultbuild;
-        $class = new $buildclass($this->_database);
+        $class = new $buildclass($this->_datainfo);
+	
+	$class->executeBuild();
 
-        $functions = $class->getBuildList();
-
-
-        if(!empty($functions))
-        {
-            foreach($functions as $i)
-            {
-                    $class->executeBuild();
-            }
-        }
         //            } catch(Zend_Exception $e){
         //                echo $e->getMessage();
         //            }
@@ -194,7 +199,7 @@ class DbVer_DvInfo {
     */
     private function insertDbSchema($build_function, $build_num){
         $data =array("build_function" => $build_function, "build_num" => $build_num);
-        if($this->_db->insert($this->_name, $data))
+        if($this->_db->insert($this->_tablename, $data))
              return true;
         return false;
     }
@@ -206,7 +211,7 @@ class DbVer_DvInfo {
     public function getLatestDbSchema(){
 
         $qry = $this->_db->select()
-                    ->from(array('d' => $this->_name), array('d.build_num'))
+                    ->from(array('d' => $this->_tablename), array('d.build_num'))
                     ->order("d.build_num DESC")
                     ->limit(1);
                     //echo $qry; exit;
@@ -227,7 +232,7 @@ class DbVer_DvInfo {
                 //Find all the functions that already ran and remove them from the list
             try {
                 $qry = $this->_db->select()
-                            ->from(array('d' => $this->_name), array('lower(d.build_function) as build_function'))
+                            ->from(array('d' => $this->_tablename), array('lower(d.build_function) as build_function'))
                             ->where("d.build_num = $this->build_id");
             } catch(Zend_Db_Exception $ed) {
                 echo $ed->getMessage();
