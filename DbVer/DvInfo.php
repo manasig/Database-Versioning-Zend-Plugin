@@ -104,6 +104,7 @@ class DbVer_DvInfo {
                 'dbname' => $database['dbname']
             ));
             Zend_Db_Table_Abstract::setDefaultAdapter($this->_db);
+            $this->_name = $database['tablename'];
         }
         return $this;
     }

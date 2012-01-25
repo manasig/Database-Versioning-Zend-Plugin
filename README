@@ -1,0 +1,27 @@
+Zend Plugin Name: DbVer
+Plugin Path: app_path/library/DbVer where app_path is your application path
+Build Files Filename: build[build_number].php
+Build Path: app_path/configs/DataVersion
+Add Following Code in your application.ini file:
+	;Database Versioning Plugin
+	;Plugin Paths
+	pluginpaths.DbVer_Resource = APPLICATION_PATH "/library/DbVer/Resource"
+	;Resource Plugins
+	resources.dvinfo.name = My Data Versioning Application ; plugin name
+	resources.dvinfo.registry_key = DvInfo ; plugin key used
+	;Database Details
+	resources.dvinfo.adapter = 
+	resources.dvinfo.params.host = 
+	resources.dvinfo.params.username = 
+	resources.dvinfo.params.password = 
+	resources.dvinfo.params.dbname = 
+	resource.dvinfo.params.tablename= ;Schema table name
+	resources.dvinfo.isDefaultTableAdapter = true
+	; Build Path and Id
+	resources.dvinfo.defaultBuild = 1
+	resources.dvinfo.buildPath = APPLICATION_PATH "/configs/DatabaseVersion/"
+	; App Path
+	resources.dvinfo.appPath = APPLICATION_PATH "/library/DbVer/"
+	; Autoloader Namespaces
+	autoloadernamespaces.0 = "DbVer"
+

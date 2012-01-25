@@ -20,6 +20,7 @@ class DbVer_Resource_Dvinfo extends Zend_Application_Resource_ResourceAbstract
         $db['username'] = isset($options['params']['username']) ? $options['params']['username'] : '';
         $db['password'] = isset($options['params']['password']) ? $options['params']['password'] : '';
         $db['dbname'] = isset($options['params']['dbname']) ? $options['params']['dbname'] : '';
+        $db['tablename'] = isset($options['params']['tablename']) ? $options['params']['tablename'] : '';
         $db['isDefaultTableAdapter'] = isset($options['params']['isDefaultTableAdapter']) ? $options['params']['isDefaultTableAdapter'] : '';
         $db['defaultBuild'] = isset($options['defaultBuild']) ? $options['defaultBuild'] : '';
         $db['buildPath'] = isset($options['buildPath']) ? $options['buildPath'] : '';
