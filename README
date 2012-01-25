@@ -17,11 +17,13 @@ Add Following Code in your application.ini file:
 	resources.dvinfo.params.dbname = 
 	resource.dvinfo.params.tablename= ;Schema table name
 	resources.dvinfo.isDefaultTableAdapter = true
-	; Build Path and Id
+	;Build Path and Id
 	resources.dvinfo.defaultBuild = 1
 	resources.dvinfo.buildPath = APPLICATION_PATH "/configs/DatabaseVersion/"
-	; App Path
+	;App Path
 	resources.dvinfo.appPath = APPLICATION_PATH "/library/DbVer/"
 	; Autoloader Namespaces
 	autoloadernamespaces.0 = "DbVer"
 
+Add the following code to the controller action function where you want to implement this plugin:
+	Zend_Registry::get('DvInfo')->adminDbClass();
