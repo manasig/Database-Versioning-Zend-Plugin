@@ -223,7 +223,6 @@ class DbVer_DvInfo {
     * This is the control method that will actually execute the code to update the db
     * @param void
     * @return void
-    * @author Jason Ball
     */
     public function executeBuild() {
 
@@ -277,7 +276,6 @@ class DbVer_DvInfo {
     /**
     * This method is just to make sure we won't execute any methods that might have already run
     * @param string $want
-    * @author Jason Ball
     */
     private function findElement($want)
     {
@@ -302,7 +300,6 @@ class DbVer_DvInfo {
     * This method lets you know how many functions are in the build list
     * @param void
     * @return integer
-    * @author Jason Ball
     */
     public function getFunctionCount()
     {
@@ -315,7 +312,6 @@ class DbVer_DvInfo {
     *
     * @param string $sql
     * @return boolean
-    * @author Jason Ball
     */
     protected function runSQL($sql)
     {
@@ -385,8 +381,7 @@ class DbVer_DvInfo {
     * This Method will return the build id
     *
     * @param void
-    * @return mixed (integer or print error message and kill process
-    * @author Jason Ball
+    * @return mixed (integer or print error message and kill process)
     */
     public function getBuildId()
     {
@@ -403,7 +398,6 @@ class DbVer_DvInfo {
     * This method is used mostly to populate build 13 data functions without running them
     * @param void
     * @return Array
-    * @author Jason Ball
     */
     public function getBuildList()
     {

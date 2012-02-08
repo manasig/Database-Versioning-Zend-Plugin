@@ -23,8 +23,7 @@ class build1 extends DbVer_DvInfo
 	}
 
         /**
-	 * This method is to execute the database query	
-	 * @author Jason Ball
+	 * This method is to execute the database query		 
 	 */
 	function testdemo1()
 	{
