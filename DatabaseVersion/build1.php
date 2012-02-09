@@ -3,8 +3,8 @@
  * @param string $pluginDir Plugin file Directory Location
  * @param string $pluginFile Plugin file Name
 */
-$pluginDir = $this->_database['appPath'];
-$pluginFile = $this->_database['key'].".php";
+$pluginDir = $this->_datainfo['appPath'];
+$pluginFile = $this->_datainfo['key'].".php";
 require_once($pluginDir.$pluginFile);
 class build1 extends DbVer_DvInfo
 {
